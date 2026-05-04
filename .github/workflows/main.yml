@@ -1,0 +1,48 @@
+
+name: Deploy Azure Function to Slot
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AZURE_FUNCTIONAPP_NAME: demo-function-app
+  AZURE_FUNCTIONAPP_SLOT: staging
+  DOTNET_VERSION: '8.0.x'   # adjust as needed
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Build and publish
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --output ./publish
+
+    - name: Zip function app
+      run: |
+        cd publish
+        zip -r ../functionapp.zip .
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to Azure Function App Slot
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        slot-name: ${{ env.AZURE_FUNCTIONAPP_SLOT }}
+        package: functionapp.zip
