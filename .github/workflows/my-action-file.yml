@@ -16,7 +16,7 @@ jobs:
 
       # Use Action located in htts://github.com/actions
       - name: Check out the repository
-        uses: actions/checkout@6
+        uses: actions/checkout@v4
 
       - run: echo "The ${{ github.repository }} repository has been cloned by the runner."
       - run: echo "The workflow is now ready to test your code on the runner."
