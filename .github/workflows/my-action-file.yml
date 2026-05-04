@@ -1,0 +1,46 @@
+name: GitHub Actions Demo
+on: push
+jobs:
+  Example-Actions_Job:
+    name: My GitHub Action
+    runs-on: ubuntu-latest
+    steps:
+      # Output a statement
+      - run: echo "This is a triggered action output by ${{github.event_name}}." 
+
+      # runner information
+      - run: echo "Now the runner would be executed on ${{ runner.os }}."
+
+      # information about the repository and branch
+      - run: echo "Your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+      # Use Action located in htts://github.com/actions
+      - name: Check out the repository
+        uses: actions/checkout@2
+
+      - run: echo "The ${{ github.repository }} repository has been cloned by the runner."
+      - run: echo "The workflow is now ready to test your code on the runner."
+      
+      - name: A conditional statement if this is a pull_request
+        if: ${{ github.event_name == 'pull request' }}
+        run: echo "This event is a pull_request"
+
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+
+      - name: Setup dotnet on runner
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '10.x'
+
+      - name: Display dotnet version
+        run: dotnet --version
+
+      - run: echo "The preinstalled tools are located on the runner at ${{ runner.tool_cache }}."
+
+      - name: List files in the tool cache
+        run: |
+          ls ${{ runner.tool_cache }}
+
+      - run: echo "This job status is ${{ job.status }}."
